@@ -5,7 +5,7 @@
 # graph = args[3]
 # iter_rep = as.numeric(args[4])
 p = 300
-n_list = c(50)
+n_list = c(100)
 prob_list = c(0.05)
 graph_list = c("cluster")
 iter_rep = 30
