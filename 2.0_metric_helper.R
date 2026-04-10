@@ -506,7 +506,7 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
 {
   
   #load data
-  filename = paste0("ssresult_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,".Rdata")
+  filename = paste0("result_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,".Rdata")
   load(file = paste0(input_dir, filename ))
   
   #obtain the true underlying data and save in the lsit obj_true
@@ -538,38 +538,38 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
   # obj_bd$time = result$time_bd
   # obj_bd$iter = length(obj_bd$all_graphs)
   
-  ##########################
-  ### ---ss method---###
-  ##########################
-  
-  #calculate all metrics and store them in the list obj_ss
-  obj_ss = calculate_metrics(all_graphs=result$all_graphs_ss,sample_graphs=result$sample_graphs_ss,
-                             all_weights=result$all_weights_ss,response=response, thin = thin,
-                             plinks_diff = plinks_diff, cut_AUC_calibrated=cut_AUC_calibrated,verbose = TRUE,
-                             cutoff=cutoff, K_hat=result$K_ss, true_K =  true_K, type="mcmc")
-  
-  #store information of all iterations to the list obj_ss
-  obj_ss$all_graphs = result$all_graphs_ss
-  obj_ss$sample_graphs = result$sample_graphs_ss
-  obj_ss$all_weights = result$all_weights_ss
-  obj_ss$K_hat = result$K_ss
-  
-  #store time and interation data to the list obj_ss
-  obj_ss$time = result$time_ss
-  obj_ss$iter = length(obj_ss$all_graphs)
-  
-  
   # ##########################
-  # ### ---SEMMS method---###
+  # ### ---ss method---###
   # ##########################
-  # semms_plinks = result$plinks_semms[upper.tri(result$plinks_semms)]
-  # #calculate all metrics and store them in the list obj_bd
-  # obj_semms = calculate_metrics(response=response, cutoff=cutoff,
-  #                               K_hat=result$K_semms, true_K=true_K,
-  #                               type="post_density",
-  #                               p_links=semms_plinks)
-  # obj_semms$K_hat = result$K_semms
-  # obj_semms$time = result$time_semms
+  # 
+  # #calculate all metrics and store them in the list obj_ss
+  # obj_ss = calculate_metrics(all_graphs=result$all_graphs_ss,sample_graphs=result$sample_graphs_ss,
+  #                            all_weights=result$all_weights_ss,response=response, thin = thin,
+  #                            plinks_diff = plinks_diff, cut_AUC_calibrated=cut_AUC_calibrated,verbose = TRUE,
+  #                            cutoff=cutoff, K_hat=result$K_ss, true_K =  true_K, type="mcmc")
+  # 
+  # #store information of all iterations to the list obj_ss
+  # obj_ss$all_graphs = result$all_graphs_ss
+  # obj_ss$sample_graphs = result$sample_graphs_ss
+  # obj_ss$all_weights = result$all_weights_ss
+  # obj_ss$K_hat = result$K_ss
+  # 
+  # #store time and interation data to the list obj_ss
+  # obj_ss$time = result$time_ss
+  # obj_ss$iter = length(obj_ss$all_graphs)
+  
+  
+  ##########################
+  ### ---SEMMS method---###
+  ##########################
+  semms_plinks = result$plinks_semms[upper.tri(result$plinks_semms)]
+  #calculate all metrics and store them in the list obj_bd
+  obj_semms = calculate_metrics(response=response, cutoff=cutoff,
+                                K_hat=result$K_semms, true_K=true_K,
+                                type="post_density",
+                                p_links=semms_plinks)
+  obj_semms$K_hat = result$K_semms
+  obj_semms$time = result$time_semms
   
   # ##########################
   # ### ---glasso method---###
@@ -591,8 +591,8 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
   #create list to store output
   output_list = list( obj_true = obj_true,
                       # obj_bd=obj_bd,
-                      obj_ss=obj_ss
-                      # obj_semms=obj_semms,
+                      # obj_ss=obj_ss,
+                      obj_semms=obj_semms
                       # obj_glasso=obj_glasso
   )
   

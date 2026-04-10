@@ -3,11 +3,12 @@ library(PRROC)
 library(data.table)
 library(StatPerMeCo)
 
-dir = "/home/tn325/HCP/sbggm_final/"
+# dir = "/home/tn325/HCP/sbggm_final/"
 # dir = "~/Documents/Cornell/Projects/HCP/Code/Simulations/sbggm_final/"
+dir = "~/Documents/Cornell/Projects/GSEMMS/Code/Experiments/"
 
 source(paste0(dir, "2.0_metric_helper.R"))
-out_dir = paste0(dir, "outTEST/")
+out_dir = paste0(dir, "out/")
 
 
 #--set parameters
@@ -52,7 +53,7 @@ for (prob in c(0.05)) {
           output_list = read_data(n=n,p=p,graph=graph,rep=rep,thin=thin,
                                   plinks_diff=plinks_diff,cut_AUC_calibrated=cut_AUC_calibrated,
                                   cutoff=cutoff, input_dir=out_dir)
-          filename = paste0("ssmetrics_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,".Rdata")
+          filename = paste0("metrics_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,".Rdata")
           save(output_list, file = paste0(out_dir, filename )) 
           
           # Concatenate into a table
@@ -94,7 +95,7 @@ for (prob in c(0.05)) {
                                         mean_time = mean(time),
                                         sd_time = sd(time)), by=c("method", "n", "p")]
         
-        write.csv(perf_summary, paste0(out_dir, "sssummary_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,"_", Sys.Date(), ".csv"))
+        write.csv(perf_summary, paste0(out_dir, "summary_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",rep,"_", Sys.Date(), ".csv"))
         
       }
     }    

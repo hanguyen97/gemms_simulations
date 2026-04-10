@@ -15,11 +15,10 @@ library(doParallel)
 
 #--load additional files --
 # dir = "/home/tn325/HCP/sbggm_final/"
-dir = "~/Documents/Cornell/Projects/GSEMMS/Code/Experiments"
+dir = "~/Documents/Cornell/Projects/GSEMMS/Code/Experiments/"
 
 out_dir = paste0(dir, "out/")
 
-source(paste0(dir, "0.0_all_helpers.R"))
 source(paste0(dir, "1.0_experiment_helper.R"))
 
 
@@ -46,7 +45,7 @@ lambda = 2 #ss parameter
 g.prior = 0.2
 
 #-- run experiments in parallel --#
-ncores <- 30
+ncores <- 1
 cl <- makeCluster(ncores)
 registerDoParallel(cl)
 
@@ -62,8 +61,8 @@ outlist = foreach(i = 1:iter_rep) %:%
     library(glasso)
     library(huge)
     library(parallel)
-    library(SEMMS)
     library(broom)
+    library(GEMMS)
     
     n <- n_list[j]
     for (prob in prob_list) {
@@ -74,12 +73,10 @@ outlist = foreach(i = 1:iter_rep) %:%
                                   g.prior = g.prior, seed=i+2023) 
         
         #--print data to a Rdata file
-        filename = paste0("ssresult_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",i,".Rdata")
+        filename = paste0("result_p",p,"_n",n,"_",graph,"_prob", prob,"_rep",i,".Rdata")
         save( result, file = paste0(out_dir, filename ))
       }
-      #     }
-      #   }
-      # }
+
       
     }
   }
