@@ -13,10 +13,10 @@ out_dir = paste0(dir, "out/")
 
 #--set parameters
 graph_list = c("cluster") 
-n_list = c(50, 100)
+n_list = c(100)
 p_list = c(300)
-rep_list = 1:30
-thin = 100
+rep_list = 1:5
+thin = 1000
 plinks_diff = 1000
 cut_AUC_calibrated = 200
 cutoff=0.5

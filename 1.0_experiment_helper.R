@@ -55,17 +55,17 @@ run_experiments = function( p , n , prob , graph = "random", type = "Gaussian",
   }
   
   
-  # #----solve data using bdmcmc method with app ratio of norm constants---#
-  # set.seed(seed+3)
-  # t1_bd      = proc.time()
-  # sample_bd  = bdgraph.mpl( data = data.sim, algorithm = "bdmcmc", iter=100000, burnin = burnin, jump = jump, 
-  #                       save = save,cores=cores,
-  #                       g.start=g.start,g.prior=g.prior) 
-  # time_bd   = as.numeric( ( proc.time() - t1_bd )[ 3 ] )
-  
-  # all_weights_bd = round(sample_bd$all_weights,10) #obtain weights for AUC vs iteration graphh
-  # all_graphs_bd = sample_bd$all_graphs #obtain graphs for AUC vs iteration graphh
-  # sample_graphs_bd = sample_bd$sample_graphs #obtain graphs for AUC vs iteration graphh
+  #----solve data using bdmcmc method with app ratio of norm constants---#
+  set.seed(seed+3)
+  t1_bd      = proc.time()
+  sample_bd  = bdgraph.mpl( data = data.sim, algorithm = "bdmcmc", iter=100000, burnin = burnin, jump = jump,
+                        save = save,cores=cores,
+                        g.start=g.start,g.prior=g.prior)
+  time_bd   = as.numeric( ( proc.time() - t1_bd )[ 3 ] )
+
+  all_weights_bd = round(sample_bd$all_weights,10) #obtain weights for AUC vs iteration graphh
+  all_graphs_bd = sample_bd$all_graphs #obtain graphs for AUC vs iteration graphh
+  sample_graphs_bd = sample_bd$sample_graphs #obtain graphs for AUC vs iteration graphh
   
   # #----solve data using ss method --------#
   # set.seed(seed+5)
@@ -96,19 +96,19 @@ run_experiments = function( p , n , prob , graph = "random", type = "Gaussian",
                            rule="or", cores=cores, nn=30)
   time_semms   = as.numeric( ( proc.time() - t1_semms )[ 3 ] )
   
-  # #----solve data using cv glasso method---#
-  # t1_glasso      = proc.time()
-  # out.glasso = huge(data.sim$data, method = "glasso")
-  # sample_glasso <- huge.select(out.glasso, criterion="ric")$opt.icov
-  # time_glasso   = as.numeric( ( proc.time() - t1_glasso )[ 3 ] )
+  #----solve data using cv glasso method---#
+  t1_glasso      = proc.time()
+  out.glasso = huge(data.sim$data, method = "glasso")
+  sample_glasso <- huge.select(out.glasso, criterion="ric")$opt.icov
+  time_glasso   = as.numeric( ( proc.time() - t1_glasso )[ 3 ] )
   
   
   
   return(list( 
-    # # bd mcmc
-    # time_bd = time_bd, all_weights_bd = all_weights_bd,
-    # all_graphs_bd = all_graphs_bd, sample_graphs_bd = sample_graphs_bd,
-    # # K_bd = as.matrix(sample_bd $ K_hat),
+    # bd mcmc
+    time_bd = time_bd, all_weights_bd = all_weights_bd,
+    all_graphs_bd = all_graphs_bd, sample_graphs_bd = sample_graphs_bd,
+    # K_bd = as.matrix(sample_bd $ K_hat),
     # # ss mcmc
     # time_ss = time_ss, all_weights_ss = all_weights_ss,
     # all_graphs_ss = all_graphs_ss, sample_graphs_ss = sample_graphs_ss,
@@ -117,9 +117,9 @@ run_experiments = function( p , n , prob , graph = "random", type = "Gaussian",
     K_semms = as.matrix(sample_semms $ K_hat),
     plinks_semms = as.matrix(sample_semms $ p_links),
     time_semms = time_semms,
-    # # cv glasso
-    # K_glasso = as.matrix(sample_glasso),
-    # time_glasso = time_glasso,
+    # cv glasso
+    K_glasso = as.matrix(sample_glasso),
+    time_glasso = time_glasso,
     # true graph
     true_g = true_g,
     true_K =  true_K,

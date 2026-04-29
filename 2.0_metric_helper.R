@@ -178,7 +178,7 @@ calculate_metrics = function (all_graphs=NULL,sample_graphs=NULL,all_weights=NUL
     iter_vec_thin = c(thin * (1:floor(iter/thin)))
     
     #create output -- plinks vectors
-    result_plinks = matrix(0,qp,iter)
+    result_plinks = matrix(0,qp,length(iter_vec_thin))
     totaltime_per_edge = c(rep(0,qp))
     
     #create thinned output vectors
@@ -196,7 +196,7 @@ calculate_metrics = function (all_graphs=NULL,sample_graphs=NULL,all_weights=NUL
     plinks_max_diff = c(rep(0,length(iter_vec_thin)))
     
     #we compute the edge inclusion matrix at every single iteration
-    for (g in 1:iter) {
+    for (j in 1:length(iter_vec_thin)) {
       # for (g in c(iter)) {
       # # print progress
       # if (verbose == TRUE) {
@@ -206,61 +206,62 @@ calculate_metrics = function (all_graphs=NULL,sample_graphs=NULL,all_weights=NUL
       #    utils::flush.console()
       #  }
       
+      g = iter_vec_thin[j]
       #compute and save posterior inclusion probability for every edge
       which_edge = which(unlist(strsplit(as.character(sample_graphs[all_graphs[g]]), "")) == 1)
       totaltime_per_edge[which_edge] = totaltime_per_edge[which_edge] + all_weights[g]
-      result_plinks[,g] = totaltime_per_edge/sum(all_weights[c(1:g)])
+      result_plinks[,j] = totaltime_per_edge/sum(all_weights[c(1:j)])
       
     }
     
-    #we calculate the AUC, CE and SVAUC values every x=thin iterations
-    i = 0
-    for (g in iter_vec_thin){
-      
-      # #print progress
-      # if (verbose == TRUE) {
-      #   mes = paste(c("Calculating metrics ... in progress : ", floor(100 * 
-      #                                                                   g/iter), "%"), collapse = "")
-      #   cat(mes, "\r")
-      #   utils::flush.console()
-      # }
-      
-      #count
-      i = i + 1
-      
-      #obtain predictor
-      predictor = result_plinks[,g]
-      
-      #calculate AUC metrics
-      AUC_ROC_vec[i] = calc_AUC_ROC(predictor=predictor,response=response)   
-      AUC_PR_vec[i] = calc_AUC_PR(predictor=predictor,response=response) 
-      AUC_ROC_calibrated_vec[i] = calc_AUC_ROC_calibrated(predictor=predictor,response=response,cut_AUC_calibrated=cut_AUC_calibrated)
-      
-      #calculate CE and MSE metric
-      CE_MSE_obj = calc_CE_MSE(predictor,response)
-      CE_vec[i] = CE_MSE_obj$CE
-      CE_weighed_vec[i] = CE_MSE_obj$CE_weighed
-      MSE_vec[i] = CE_MSE_obj$MSE
-      MSE_weighed_vec[i] = CE_MSE_obj$MSE_weighed
-      
-      #calculate TP,FP,TN,FN
-      TP_FP_obj = calc_TP_FP(predictor,response,cutoff)
-      TP_vec[i] =  TP_FP_obj$tp
-      FP_vec[i] =  TP_FP_obj$fp
-      TN_vec[i] =  TP_FP_obj$tn
-      FN_vec[i] =  TP_FP_obj$fn
-      
-      #calculate plinks convergence
-      if (g > plinks_diff){
-        diff = abs(result_plinks[,g]-result_plinks[,g-plinks_diff])
-        plinks_max_diff[i] = max(diff)
-      }
-      
-      
-    }
+    # #we calculate the AUC, CE and SVAUC values every x=thin iterations
+    # i = 0
+    # for (g in iter_vec_thin){
+    #   
+    #   # #print progress
+    #   # if (verbose == TRUE) {
+    #   #   mes = paste(c("Calculating metrics ... in progress : ", floor(100 * 
+    #   #                                                                   g/iter), "%"), collapse = "")
+    #   #   cat(mes, "\r")
+    #   #   utils::flush.console()
+    #   # }
+    #   
+    #   #count
+    #   i = i + 1
+    #   
+    #   #obtain predictor
+    #   predictor = result_plinks[,g]
+    #   
+    #   #calculate AUC metrics
+    #   AUC_ROC_vec[i] = calc_AUC_ROC(predictor=predictor,response=response)   
+    #   AUC_PR_vec[i] = calc_AUC_PR(predictor=predictor,response=response) 
+    #   AUC_ROC_calibrated_vec[i] = calc_AUC_ROC_calibrated(predictor=predictor,response=response,cut_AUC_calibrated=cut_AUC_calibrated)
+    #   
+    #   #calculate CE and MSE metric
+    #   CE_MSE_obj = calc_CE_MSE(predictor,response)
+    #   CE_vec[i] = CE_MSE_obj$CE
+    #   CE_weighed_vec[i] = CE_MSE_obj$CE_weighed
+    #   MSE_vec[i] = CE_MSE_obj$MSE
+    #   MSE_weighed_vec[i] = CE_MSE_obj$MSE_weighed
+    #   
+    #   #calculate TP,FP,TN,FN
+    #   TP_FP_obj = calc_TP_FP(predictor,response,cutoff)
+    #   TP_vec[i] =  TP_FP_obj$tp
+    #   FP_vec[i] =  TP_FP_obj$fp
+    #   TN_vec[i] =  TP_FP_obj$tn
+    #   FN_vec[i] =  TP_FP_obj$fn
+    #   
+    #   #calculate plinks convergence
+    #   if (g > plinks_diff){
+    #     diff = abs(result_plinks[,g]-result_plinks[,g-plinks_diff])
+    #     plinks_max_diff[i] = max(diff)
+    #   }
+    #   
+    #   
+    # }
     
     #calculate final predictor
-    predictor = result_plinks[,iter] 
+    predictor = result_plinks[,length(iter_vec_thin)] 
     
     #calculate final AUC metrics
     AUC_ROC = calc_AUC_ROC(predictor=predictor,response=response)   
@@ -500,7 +501,7 @@ calculate_metrics = function (all_graphs=NULL,sample_graphs=NULL,all_weights=NUL
   return(out)
 }
 
-read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
+read_data = function(n=100,p=10,graph="random",rep=1,thin=1000,
                      plinks_diff=1000,cut_AUC_calibrated=200,cutoff=0.5,
                      input_dir=NULL)
 {
@@ -517,26 +518,26 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
   true_data = result$true_data
   obj_true = list(actual=actual,response=response,true_K=true_K,true_sigma=true_sigma,true_data=true_data)
   
-  # # ##########################
-  # # ### ---bd method---###
-  # # ##########################
+  # ##########################
+  # ### ---bd method---###
+  # ##########################
   
-  # #calculate all metrics and store them in the list obj_bd
-  # # ignore K hat of bd method
-  # obj_bd = calculate_metrics(all_graphs=result$all_graphs_bd,sample_graphs=result$sample_graphs_bd,
-  #                            all_weights=result$all_weights_bd,response=response, thin = thin,
-  #                            plinks_diff = plinks_diff, cut_AUC_calibrated=cut_AUC_calibrated,verbose = TRUE,
-  #                            cutoff=cutoff, K_hat=true_K, true_K = true_K, type="mcmc")
+  #calculate all metrics and store them in the list obj_bd
+  # ignore K hat of bd method
+  obj_bd = calculate_metrics(all_graphs=result$all_graphs_bd,sample_graphs=result$sample_graphs_bd,
+                             all_weights=result$all_weights_bd,response=response, thin = thin,
+                             plinks_diff = plinks_diff, cut_AUC_calibrated=cut_AUC_calibrated,verbose = TRUE,
+                             cutoff=0.1, K_hat=true_K, true_K = true_K, type="mcmc")
   
-  # #store information of all iterations to the list obj_bd
-  # obj_bd$all_graphs = result$all_graphs_bd
-  # obj_bd$sample_graphs = result$sample_graphs_bd
-  # obj_bd$all_weights = result$all_weights_bd
-  # obj_bd$K_hat = result$K_bd
+  #store information of all iterations to the list obj_bd
+  obj_bd$all_graphs = result$all_graphs_bd
+  obj_bd$sample_graphs = result$sample_graphs_bd
+  obj_bd$all_weights = result$all_weights_bd
+  obj_bd$K_hat = result$K_bd
   
-  # #store time and interation data to the list obj_bd
-  # obj_bd$time = result$time_bd
-  # obj_bd$iter = length(obj_bd$all_graphs)
+  #store time and interation data to the list obj_bd
+  obj_bd$time = result$time_bd
+  obj_bd$iter = length(obj_bd$all_graphs)
   
   # ##########################
   # ### ---ss method---###
@@ -575,14 +576,14 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
   # ### ---glasso method---###
   # ##########################
   
-  # #calculate all metrics and store them in the list obj_glasso
-  # obj_glasso = calculate_metrics(response=response, cutoff=cutoff,
-  #                               K_hat=result$K_glasso, true_K =  true_K,
-  #                               type="point_est")
-  # obj_glasso$K_hat = result$K_glasso
+  #calculate all metrics and store them in the list obj_glasso
+  obj_glasso = calculate_metrics(response=response, cutoff=cutoff,
+                                K_hat=result$K_glasso, true_K =  true_K,
+                                type="point_est")
+  obj_glasso$K_hat = result$K_glasso
   
-  # #store time and interation data to the list obj_bd
-  # obj_glasso$time = result$time_glasso
+  #store time and interation data to the list obj_bd
+  obj_glasso$time = result$time_glasso
   
   ##########################
   ### ---Output method---###
@@ -590,10 +591,10 @@ read_data = function(n=100,p=10,graph="random",rep=1,thin=100,
   
   #create list to store output
   output_list = list( obj_true = obj_true,
-                      # obj_bd=obj_bd,
+                      obj_bd=obj_bd,
                       # obj_ss=obj_ss,
-                      obj_semms=obj_semms
-                      # obj_glasso=obj_glasso
+                      obj_semms=obj_semms,
+                      obj_glasso=obj_glasso
   )
   
   return(output_list)                      
